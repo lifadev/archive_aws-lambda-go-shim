@@ -204,7 +204,6 @@ func shim_gohandle(cevt, cctx, cenv *C.char) (cres *C.char) {
 			cres = errorf(err.Error())
 		} else {
 			cres = C.CString(string(bres))
-			println(cres == nil)
 		}
 	}
 

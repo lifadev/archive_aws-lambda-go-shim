@@ -15,7 +15,6 @@
 //
 
 #include <Python.h>
-#include <frameobject.h>
 #include <stdlib.h>
 
 #ifdef __cplusplus
