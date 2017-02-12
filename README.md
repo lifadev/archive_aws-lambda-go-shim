@@ -76,6 +76,29 @@ make
 ```
 
 [<img src="_asset/misc_arrow-up.png" align="right">](#top)
+### Create role
+
+```
+cat >role.json <<EOL
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Sid": "",
+    "Effect": "Allow",
+    "Principal": {
+      "Service": "lambda.amazonaws.com"
+    },
+    "Action": "sts:AssumeRole"
+  }]
+}
+EOL
+
+aws iam create-role --role-name lambda_basic_execution --assume-role-policy-document file://role.json
+aws iam update-assume-role-policy --role-name lambda_basic_execution --policy-document file://role.json
+
+```
+
+[<img src="_asset/misc_arrow-up.png" align="right">](#top)
 ### Deploy 
 
 ```sh
