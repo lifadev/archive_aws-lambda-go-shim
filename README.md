@@ -20,6 +20,7 @@ This project fills the gap.
     - [Dependencies](#dependencies)
     - [Create](#create)
     - [Build](#build)
+    - [Configure](#configure)
     - [Deploy](#deploy)
     - [Invoke](#invoke)
   - [Programming Model](#programming-model)
@@ -76,14 +77,15 @@ make
 ```
 
 [<img src="_asset/misc_arrow-up.png" align="right">](#top)
-### Create role
+### Configure
+
+If you've already created a lambda function via the AWS console, you can skip this step since the `lambda_basic_execution` role will have already been created for you.
 
 ```
-cat >role.json <<EOL
+cat > trust-policy.json <<EOL
 {
   "Version": "2012-10-17",
   "Statement": [{
-    "Sid": "",
     "Effect": "Allow",
     "Principal": {
       "Service": "lambda.amazonaws.com"
@@ -93,8 +95,8 @@ cat >role.json <<EOL
 }
 EOL
 
-aws iam create-role --role-name lambda_basic_execution --assume-role-policy-document file://role.json
-aws iam update-assume-role-policy --role-name lambda_basic_execution --policy-document file://role.json
+aws iam create-role --role-name lambda_basic_execution --assume-role-policy-document file://trust-policy.json
+aws iam attach-role-policy --role-name lambda_basic_execution --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
 ```
 
