@@ -97,7 +97,6 @@ EOL
 
 aws iam create-role --role-name lambda_basic_execution --assume-role-policy-document file://trust-policy.json
 aws iam attach-role-policy --role-name lambda_basic_execution --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-
 ```
 
 [<img src="_asset/misc_arrow-up.png" align="right">](#top)
