@@ -198,10 +198,12 @@ func shim_gohandle(cevt, cctx, cenv *C.char) (cres *C.char) {
 	res := hval.Call(args)
 	if !res[1].IsNil() {
 		cres = errorf(res[1].Interface().(error).Error())
+		log.Println(C.GoString(cres))
 	} else {
 		bres, err := json.Marshal(res[0].Interface())
 		if err != nil {
 			cres = errorf(err.Error())
+			log.Println(C.GoString(cres))
 		} else {
 			cres = C.CString(string(bres))
 		}
