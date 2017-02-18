@@ -35,7 +35,6 @@ import (
 	"plugin"
 	"reflect"
 	"runtime"
-	"strconv"
 	"sync"
 	"time"
 	"unsafe"
@@ -84,11 +83,6 @@ func shim_golookup(cname *C.char) *C.char {
 	return nil
 }
 
-func errorf(format string, a ...interface{}) *C.char {
-	err := fmt.Sprintf(format, a...)
-	return C.CString(fmt.Sprintf(`{"errorMessage":%s}`, strconv.QuoteToASCII(err)))
-}
-
 func scan(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if atEOF && len(data) == 0 {
 		return 0, nil, nil
@@ -100,6 +94,17 @@ func scan(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		return len(data), data, nil
 	}
 	return 0, nil, nil
+}
+
+func shim_cresult(d interface{}, f string, a ...interface{}) *C.char {
+	b, err := json.Marshal(&struct {
+		Data  interface{} `json:",omitempty"`
+		Error string      `json:",omitempty"`
+	}{d, fmt.Sprintf(f, a...)})
+	if err != nil {
+		panic(err)
+	}
+	return C.CString(string(b))
 }
 
 //export shim_gohandle
@@ -120,10 +125,10 @@ func shim_gohandle(cevt, cctx, cenv *C.char) (cres *C.char) {
 		C.free(unsafe.Pointer(d))
 
 		if ctx != nil {
-			cres = errorf("RequestId: %s Process exited before completing request", ctx.AWSRequestID)
+			cres = shim_cresult(nil, "RequestId: %s Process exited before completing request", ctx.AWSRequestID)
 			return
 		}
-		cres = errorf("Process exited before completing request")
+		cres = shim_cresult(nil, "Process exited before completing request")
 	}()
 
 	hval := reflect.ValueOf(sym)
@@ -136,26 +141,26 @@ func shim_gohandle(cevt, cctx, cenv *C.char) (cres *C.char) {
 
 	knd := htyp.Kind()
 	if knd != reflect.Func {
-		return errorf("Cannot use handler '%s' with type '%s'", hnm, knd)
+		return shim_cresult(nil, "Cannot use handler '%s' with type '%s'", hnm, knd)
 	}
 
 	if hval.IsNil() {
-		return errorf("Cannot call nil handler '%s'", hnm)
+		return shim_cresult(nil, "Cannot call nil handler '%s'", hnm)
 	}
 
 	if htyp.NumIn() != 2 || htyp.In(1) != ctyp ||
 		htyp.NumOut() != 2 || !htyp.Out(1).Implements(reflect.TypeOf((*error)(nil)).Elem()) {
-		return errorf("Cannot use handler '%s' with invalid signature", hnm)
+		return shim_cresult(nil, "Cannot use handler '%s' with invalid signature", hnm)
 	}
 
 	eval := reflect.New(htyp.In(0))
 	if err := json.Unmarshal([]byte(C.GoString(cevt)), eval.Interface()); err != nil {
-		return errorf(err.Error())
+		return shim_cresult(nil, err.Error())
 	}
 
 	ctx = new(lruntime.Context)
 	if err := json.Unmarshal([]byte(C.GoString(cctx)), ctx); err != nil {
-		return errorf(err.Error())
+		return shim_cresult(nil, err.Error())
 	}
 	ctx.RemainingTimeInMillis = func() int64 {
 		return int64(C.shim_crtm())
@@ -163,7 +168,7 @@ func shim_gohandle(cevt, cctx, cenv *C.char) (cres *C.char) {
 
 	var env map[string]string
 	if err := json.Unmarshal([]byte(C.GoString(cenv)), &env); err != nil {
-		return errorf(err.Error())
+		return shim_cresult(nil, err.Error())
 	}
 	for k, v := range env {
 		os.Setenv(k, v)
@@ -172,7 +177,7 @@ func shim_gohandle(cevt, cctx, cenv *C.char) (cres *C.char) {
 	var wg sync.WaitGroup
 	outputr, outputw, err := os.Pipe()
 	if err != nil {
-		return errorf(err.Error())
+		return shim_cresult(nil, err.Error())
 	}
 	stdouto := os.Stdout
 	stderro := os.Stderr
@@ -197,16 +202,10 @@ func shim_gohandle(cevt, cctx, cenv *C.char) (cres *C.char) {
 	args[1] = reflect.ValueOf(ctx)
 	res := hval.Call(args)
 	if !res[1].IsNil() {
-		cres = errorf(res[1].Interface().(error).Error())
+		cres = shim_cresult(nil, res[1].Interface().(error).Error())
 		log.Println(C.GoString(cres))
 	} else {
-		bres, err := json.Marshal(res[0].Interface())
-		if err != nil {
-			cres = errorf(err.Error())
-			log.Println(C.GoString(cres))
-		} else {
-			cres = C.CString(string(bres))
-		}
+		cres = shim_cresult(res[0].Interface(), "")
 	}
 
 	outputw.Close()
