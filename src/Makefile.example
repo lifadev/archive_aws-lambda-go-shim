@@ -31,7 +31,7 @@ PACKAGE ?= package
 
 all:
 	@docker run --rm \
-		-v $(GOPATH):/go -v $(PWD):/tmp \
+		-v $(GOPATH):/go -v $(CURDIR):/tmp \
 		-e "HANDLER=$(HANDLER)" -e "PACKAGE=$(PACKAGE)" \
 		eawsy/aws-lambda-go-shim make _all
 
