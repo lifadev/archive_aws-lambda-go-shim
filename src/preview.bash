@@ -38,8 +38,7 @@ ensure aws docker go make wget
 
 echo -e "\e[32m> Pull AWS Lambda build environment from Docker Hub\e[0m"
 
-#docker pull eawsy/aws-lambda-go-shim:latest
-docker pull amazonlinux:latest
+docker pull eawsy/aws-lambda-go-shim:latest
 
 echo
 echo -e "\e[32m> Download AWS Lambda Go dependencies from Github\e[0m"
@@ -49,8 +48,7 @@ go get -v -u -d github.com/eawsy/aws-lambda-go-core/...
 echo
 echo -e "\e[32m> Download handy Makefile from Github\e[0m"
 
-#wget -O Makefile https://github.com/eawsy/aws-lambda-go-shim/raw/master/src/Makefile.example
-wget -O Makefile http://localhost:8000/src/Makefile.example
+wget -O Makefile https://github.com/eawsy/aws-lambda-go-shim/raw/master/src/Makefile.example
 
 echo
 echo -e "\e[32m> Check AWS Lambda basic execution role\e[0m"
