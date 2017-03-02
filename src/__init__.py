@@ -14,15 +14,15 @@
 # limitations under the License.
 #
 
-import sys
 import dl
+import sys
 
 sys.setdlopenflags(sys.getdlopenflags() | dl.RTLD_NOW | dl.RTLD_GLOBAL)
 
-import shim
+import runtime
 
-shim.open(__name__)
+runtime.open(__name__)
 
-import handler
+import proxy
 
-sys.modules[__name__] = handler.Handler()
+sys.modules[__name__] = proxy.Proxy()

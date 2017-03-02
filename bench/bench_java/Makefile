@@ -27,34 +27,22 @@
 
 HANDLER ?= handler
 PACKAGE ?= $(HANDLER)
-GOPATH  ?= $(HOME)/go
 
-WORKDIR = $(CURDIR:$(GOPATH)%=/go%)
-ifeq ($(WORKDIR),$(CURDIR))
-	WORKDIR = /tmp
-endif
-
-docker:
-	@docker run --rm                                                             \
-	  -e HANDLER=$(HANDLER)                                                      \
-	  -e PACKAGE=$(PACKAGE)                                                      \
-	  -v $(GOPATH):/go                                                           \
-	  -v $(CURDIR):/tmp                                                          \
-	  -w $(WORKDIR)                                                              \
-	  eawsy/aws-lambda-go-shim:latest make all
-
-all: build pack perm
+all: build pack
 
 build:
-	@go build -buildmode=plugin -ldflags='-w -s' -o $(HANDLER).so
+	@docker run --rm                                                             \
+	  -v $(CURDIR):/tmp                                                          \
+	  -w /tmp                                                                    \
+	  openjdk:8-jdk bash -c "                                                    \
+	    javac -d . Handler.java;                                                 \
+	    chown -R $(shell id -u):$(shell id -g) *                                 \
+	  "
 
 pack:
-	@pack $(HANDLER) $(HANDLER).so $(PACKAGE).zip
-
-perm:
-	@chown $(shell stat -c '%u:%g' .) $(HANDLER).so $(PACKAGE).zip
+	@zip -rq $(PACKAGE).zip $(HANDLER)
 
 clean:
-	@rm -rf $(HANDLER) $(HANDLER).so $(PACKAGE).zip
+	@rm -rf $(HANDLER) $(PACKAGE).zip hsperfdata_root
 
-.PHONY: docker all build pack perm clean
+.PHONY: all build pack clean

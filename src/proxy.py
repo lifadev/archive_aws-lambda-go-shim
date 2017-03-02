@@ -14,31 +14,29 @@
 # limitations under the License.
 #
 
-import os
 import json
+import os
 
-import shim
+import runtime
 
 def dump(obj):
     if hasattr(obj, '__slots__'):
         return {slot: getattr(obj, slot) for slot in obj.__slots__}
     return obj.__dict__
 
-class Handler(object):
+class Proxy(object):
     def __getattr__(self, name):
         if name == "init":
             return lambda: None
-        shim.lookup(name)
+        runtime.lookup(name)
         return self._handle
 
     def _handle(self, evt, ctx):
-        res = shim.handle(json.dumps(evt),
-                          json.dumps(ctx, default=dump),
-                          json.dumps(dict(**os.environ)),
-                          ctx.get_remaining_time_in_millis)
+        res = runtime.handle(json.dumps(evt), json.dumps(ctx, default=dump),
+                             json.dumps(dict(**os.environ)),
+                             ctx.log, ctx.get_remaining_time_in_millis)
         if res is not None:
             res = json.loads(res)
             if "Error" in res:
                 raise Exception(res["Error"])
-            if "Data" in res:
-                return res["Data"]
+            return res["Result"]

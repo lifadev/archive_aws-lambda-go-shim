@@ -16,6 +16,6 @@
 
 FROM eawsy/aws-lambda-go-shim:base
 
-WORKDIR /tmp
+ENV PATH /shim:$PATH
 
-COPY src/shim /shim
+COPY ./dist /shim

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #
 # This is free and unencumbered software released into the public domain.
 #
@@ -25,36 +27,5 @@
 # For more information, please refer to <http://unlicense.org/>
 #
 
-HANDLER ?= handler
-PACKAGE ?= $(HANDLER)
-GOPATH  ?= $(HOME)/go
-
-WORKDIR = $(CURDIR:$(GOPATH)%=/go%)
-ifeq ($(WORKDIR),$(CURDIR))
-	WORKDIR = /tmp
-endif
-
-docker:
-	@docker run --rm                                                             \
-	  -e HANDLER=$(HANDLER)                                                      \
-	  -e PACKAGE=$(PACKAGE)                                                      \
-	  -v $(GOPATH):/go                                                           \
-	  -v $(CURDIR):/tmp                                                          \
-	  -w $(WORKDIR)                                                              \
-	  eawsy/aws-lambda-go-shim:latest make all
-
-all: build pack perm
-
-build:
-	@go build -buildmode=plugin -ldflags='-w -s' -o $(HANDLER).so
-
-pack:
-	@pack $(HANDLER) $(HANDLER).so $(PACKAGE).zip
-
-perm:
-	@chown $(shell stat -c '%u:%g' .) $(HANDLER).so $(PACKAGE).zip
-
-clean:
-	@rm -rf $(HANDLER) $(HANDLER).so $(PACKAGE).zip
-
-.PHONY: docker all build pack perm clean
+def Handle(evt, ctx):
+    pass

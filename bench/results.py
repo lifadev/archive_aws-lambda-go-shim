@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #
 # This is free and unencumbered software released into the public domain.
 #
@@ -25,36 +27,24 @@
 # For more information, please refer to <http://unlicense.org/>
 #
 
-HANDLER ?= handler
-PACKAGE ?= $(HANDLER)
-GOPATH  ?= $(HOME)/go
+import numpy as np
 
-WORKDIR = $(CURDIR:$(GOPATH)%=/go%)
-ifeq ($(WORKDIR),$(CURDIR))
-	WORKDIR = /tmp
-endif
+if __name__ == "__main__":
 
-docker:
-	@docker run --rm                                                             \
-	  -e HANDLER=$(HANDLER)                                                      \
-	  -e PACKAGE=$(PACKAGE)                                                      \
-	  -v $(GOPATH):/go                                                           \
-	  -v $(CURDIR):/tmp                                                          \
-	  -w $(WORKDIR)                                                              \
-	  eawsy/aws-lambda-go-shim:latest make all
+    for exp in ["python", "eawsy", "nodejs", "java", "dotnet"]:
 
-all: build pack perm
+        runs = np.array([float(line.rstrip("\n"))
+                         for line in open("bench_" + exp + "/runs.txt")])
 
-build:
-	@go build -buildmode=plugin -ldflags='-w -s' -o $(HANDLER).so
-
-pack:
-	@pack $(HANDLER) $(HANDLER).so $(PACKAGE).zip
-
-perm:
-	@chown $(shell stat -c '%u:%g' .) $(HANDLER).so $(PACKAGE).zip
-
-clean:
-	@rm -rf $(HANDLER) $(HANDLER).so $(PACKAGE).zip
-
-.PHONY: docker all build pack perm clean
+        print exp
+        print "========"
+        print "Min     \t", np.min(runs)
+        print "10th pct\t", np.percentile(runs, 10)
+        print "50th pct\t", np.percentile(runs, 50)
+        print "90th pct\t", np.percentile(runs, 90)
+        print "95th pct\t", np.percentile(runs, 95)
+        print "99th pct\t", np.percentile(runs, 99)
+        print "Max     \t", np.max(runs)
+        print "Mean    \t", np.mean(runs)
+        print "Std Dev \t", np.std(runs)
+        print

@@ -2,7 +2,10 @@
 
 *.bash text
 *.c text
+*.cs text
 *.go text
+*.java text
+*.js text
 *.md text
 *.py text
 

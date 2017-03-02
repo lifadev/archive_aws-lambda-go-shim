@@ -14,19 +14,24 @@
 # limitations under the License.
 #
 
-FROM amazonlinux:latest
+import os
+import unittest
 
-ENV GOLANG_VERSION 1.8
-ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
-ENV GOLANG_DOWNLOAD_SHA256 53ab94104ee3923e228a2cb2116e5e462ad3ebaeea06ff04463479d7f12d27ca
+import handler
 
-ENV GOPATH /go
-ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+class Context:
 
-RUN true \
-  && yum -q -e 0 -y update || true \
-  && yum -q -e 0 -y install gcc gcc-c++ python27-devel || true \
-  && yum -q -e 0 -y clean all \
-  && curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
-  && echo "$GOLANG_DOWNLOAD_SHA256 golang.tar.gz" | sha256sum -c - \
-  && tar -C /usr/local -xzf golang.tar.gz; rm golang.tar.gz
+    def get_remaining_time_in_millis(self):
+        pass
+
+    def log(self):
+        pass
+
+class TestCase(unittest.TestCase):
+
+    def test_case(self):
+        os.environ["FOO"] = "BAR"
+        self.assertEqual("BAR", handler.Handle({}, Context()))
+        os.environ["FOO"] = "BAZ"
+        self.assertEqual("BAZ", handler.Handle({}, Context()))
+

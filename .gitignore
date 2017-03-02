@@ -1,5 +1,13 @@
+*.class
+*.dll
 *.h
+*.jar
+*.pdb
 *.pyc
 *.pyo
 *.so
 *.zip
+
+.envrc
+
+dist
