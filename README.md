@@ -50,7 +50,7 @@ wget -qO- https://github.com/eawsy/aws-lambda-go-shim/raw/master/src/preview.bas
   We do not intend to compare Go with other languages but to appreciate the overhead of our shim compared to officialy
   supported AWS Lambda languages.
 
-:sunglasses: It is the 2nd fastest way to run an AWS Lambda function and makes the Node.js *spwan process* technique 
+:sunglasses: It is the 2nd fastest way to run an AWS Lambda function and makes the Node.js *spawn process* technique 
 obsolete.
 
 ![Benchmark](asset/bench_1000.png)
