@@ -30,6 +30,10 @@ static PyObject *runtime_log_fn,
 void
 runtime_log(char *msg)
 {
+    if (runtime_log_fn == NULL) {
+        free(msg);
+        return;
+    }
     PyObject *tmp = PyObject_CallFunction(runtime_log_fn, "s", msg);
     if (tmp != NULL) {
         Py_DECREF(tmp);

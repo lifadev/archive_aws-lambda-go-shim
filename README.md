@@ -47,7 +47,7 @@ wget -qO- https://github.com/eawsy/aws-lambda-go-shim/raw/master/src/preview.bas
 ## Performance
 
 > DISCLAIMER:
-  We do not intend to compare Go with other languages but to appreciate the overhead of our shim compared to officialy
+  We do not intend to compare Go with other languages but to appreciate the overhead of our shim compared to officially
   supported AWS Lambda languages.
 
 :sunglasses: It is the 2nd fastest way to run an AWS Lambda function and makes the Node.js *spawn process* technique 
@@ -276,7 +276,7 @@ pack:
       └── mypackage.zip
   ```
 
-- **Dockerize** – The `dockerize` target runs our Docker image and executes the rest of the build process inside it.
+- **Dockerize** – The `docker` target runs our Docker image and executes the rest of the build process inside it.
 
 - **Build** – The `build` target builds your code with the [plugin build mode][golang-mode]. Feel free to customize 
   build flags.
@@ -301,7 +301,18 @@ Lambda:
 
 - For now you cannot have more than 8 exported functions in your main package due to 
   [golang/go#19269](https://github.com/golang/go/issues/19269).
-- The behavior of the Go fmt package is non-deterministic in CloudWatch Logs. Please use Go log package for logging.
+- The behavior of the Go fmt package is non-deterministic in AWS CloudWatch Logs. Please use Go log package instead.
+
+[<img src="asset/misc_arrow-up.png" align="right">](#top)
+### Edge Behaviors
+
+> Even if some of these behaviors can be overcome, we try as much as possible to mimic official AWS Lambda runtimes.
+
+- Log statements are not visible during initialization. If you log anything in the `init` function, it won't be written
+  in AWS CloudWatch Logs.
+
+- Environment variables are not available during initialization. If you make any calls to AWS services in the `init` 
+  function, they won't succeed.
 
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
 ## About
