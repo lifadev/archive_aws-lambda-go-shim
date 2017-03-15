@@ -50,9 +50,24 @@ func (l *logger) Write(p []byte) (int, error) {
 	return len(p), nil
 }
 
+func populate(raw []byte) error {
+	env := make(map[string]string)
+	if err := json.Unmarshal(raw, &env); err != nil {
+		return err
+	}
+	for k, v := range env {
+		os.Setenv(k, v)
+	}
+	return nil
+}
+
 //export open
-func open(cpath *C.char) *C.char {
+func open(cpath *C.char, cenv *C.char) *C.char {
 	var err error
+	err = populate([]byte(C.GoString(cenv)))
+	if err != nil {
+		return C.CString(err.Error())
+	}
 	plug, err = plugin.Open(C.GoString(cpath) + ".so")
 	if err != nil {
 		return C.CString(err.Error())
@@ -101,13 +116,21 @@ func resultf(res interface{}) *C.char {
 
 //export handle
 func handle(cevt, cctx, cenv *C.char) *C.char {
+	var err error
+	err = populate([]byte(C.GoString(cenv)))
+	if err != nil {
+		return errorf(err)
+	}
+
 	evt := reflect.New(etyp)
-	if err := json.Unmarshal([]byte(C.GoString(cevt)), evt.Interface()); err != nil {
+	err = json.Unmarshal([]byte(C.GoString(cevt)), evt.Interface())
+	if err != nil {
 		return errorf(err)
 	}
 
 	ctx := reflect.New(ctyp)
-	if err := json.Unmarshal([]byte(C.GoString(cctx)), ctx.Interface()); err != nil {
+	err = json.Unmarshal([]byte(C.GoString(cctx)), ctx.Interface())
+	if err != nil {
 		return errorf(err)
 	}
 	ctx.Elem().Elem().FieldByName("RemainingTimeInMillis").Set(reflect.ValueOf(func() int64 {
@@ -115,14 +138,6 @@ func handle(cevt, cctx, cenv *C.char) *C.char {
 		defer lock.Unlock()
 		return int64(C.runtime_rtm())
 	}))
-
-	env := make(map[string]string)
-	if err := json.Unmarshal([]byte(C.GoString(cenv)), &env); err != nil {
-		return errorf(err)
-	}
-	for k, v := range env {
-		os.Setenv(k, v)
-	}
 
 	res := hval.Call([]reflect.Value{evt.Elem(), ctx.Elem()})
 	if !res[1].IsNil() {

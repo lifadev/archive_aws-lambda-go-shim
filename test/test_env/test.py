@@ -17,6 +17,11 @@
 import os
 import unittest
 
+os.environ["AWS_ACCESS_KEY_ID"] = "i1"
+os.environ["AWS_SECRET_ACCESS_KEY"] = "i2"
+os.environ["AWS_SESSION_TOKEN"] = "i3"
+os.environ["AWS_SECURITY_TOKEN"] = "i4"
+
 import handler
 
 class Context:
@@ -30,8 +35,13 @@ class Context:
 class TestCase(unittest.TestCase):
 
     def test_case(self):
-        os.environ["FOO"] = "BAR"
-        self.assertEqual("BAR", handler.Handle({}, Context()))
-        os.environ["FOO"] = "BAZ"
-        self.assertEqual("BAZ", handler.Handle({}, Context()))
+        try:
+            self.assertEqual(["i1", "i2", "i3", "i4"], handler.Handle({}, Context()))
+            os.environ["AWS_ACCESS_KEY_ID"] = "h1"
+            os.environ["AWS_SECRET_ACCESS_KEY"] = "h2"
+            os.environ["AWS_SESSION_TOKEN"] = "h3"
+            os.environ["AWS_SECURITY_TOKEN"] = "h4"
+            self.assertEqual(["h1", "h2", "h3", "h4"], handler.Handle({}, Context()))
+        except Exception:
+            self.fail("should not raise")
 

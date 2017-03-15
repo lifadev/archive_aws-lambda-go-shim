@@ -306,13 +306,10 @@ Lambda:
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
 ### Edge Behaviors
 
-> Even if some of these behaviors can be overcome, we try as much as possible to mimic official AWS Lambda runtimes.
+> Even if some of these behaviors can be overcome, we mimic the official AWS Lambda runtimes.
 
 - Log statements are not visible during initialization. If you log anything in the `init` function, it won't be written
   in AWS CloudWatch Logs.
-
-- Environment variables are not available during initialization. If you make any calls to AWS services in the `init` 
-  function, they won't succeed.
 
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
 ## About

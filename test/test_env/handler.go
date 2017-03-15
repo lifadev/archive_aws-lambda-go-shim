@@ -17,11 +17,30 @@
 package main
 
 import (
+	"errors"
 	"os"
 
 	"github.com/eawsy/aws-lambda-go-core/service/lambda/runtime"
 )
 
+var ok = true
+
+func init() {
+	ok = ok && os.Getenv("AWS_ACCESS_KEY_ID") == "i1"
+	ok = ok && os.Getenv("AWS_SECRET_ACCESS_KEY") == "i2"
+	ok = ok && os.Getenv("AWS_SESSION_TOKEN") == "i3"
+	ok = ok && os.Getenv("AWS_SECURITY_TOKEN") == "i4"
+}
+
 func Handle(interface{}, *runtime.Context) (interface{}, error) {
-	return os.Getenv("FOO"), nil
+	if !ok {
+		return nil, errors.New("env not intialized")
+	}
+
+	return []string{
+		os.Getenv("AWS_ACCESS_KEY_ID"),
+		os.Getenv("AWS_SECRET_ACCESS_KEY"),
+		os.Getenv("AWS_SESSION_TOKEN"),
+		os.Getenv("AWS_SECURITY_TOKEN"),
+	}, nil
 }

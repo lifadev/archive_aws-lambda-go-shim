@@ -20,9 +20,9 @@
 extern "C" {
 #endif
 
-extern char * open(const char *);
+extern char * open(const char *, const char *);
 extern char * lookup(const char *);
-extern char * handle(const char*, const char*, const char *);
+extern char * handle(const char *, const char *, const char *);
 
 static PyObject *runtime_log_fn,
                 *runtime_rtm_fn;
@@ -56,11 +56,16 @@ runtime_rtm()
 }
 
 static PyObject *
-runtime_open(PyObject *self, PyObject *arg)
+runtime_open(PyObject *self, PyObject *args)
 {
+    const char *cnme, *cenv;
     char *err;
 
-    if (!(err = open(PyString_AS_STRING(arg)))) {
+    if (!PyArg_ParseTuple(args, "ss", &cnme, &cenv)) {
+        return NULL;
+    }
+
+    if (!(err = open(cnme, cenv))) {
         Py_RETURN_NONE;
     }
 
@@ -106,7 +111,7 @@ runtime_handle(PyObject *self, PyObject *args)
 }
 
 static PyMethodDef runtime_methods[] = {
-    {"open",   runtime_open,   METH_O},
+    {"open",   runtime_open,   METH_VARARGS},
     {"lookup", runtime_lookup, METH_O},
     {"handle", runtime_handle, METH_VARARGS},
     {NULL, NULL}
