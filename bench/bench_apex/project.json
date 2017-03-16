@@ -1,0 +1,7 @@
+{
+  "name": "handler",
+  "runtime": "go",
+  "shim": true,
+  "role": "dummy",
+  "handler": "dummy"
+}
