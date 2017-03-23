@@ -104,18 +104,16 @@ func lookup(cname *C.char) *C.char {
 	return nil
 }
 
-func errorf(err error) *C.char {
-	b, _ := json.Marshal(&struct{ Error string }{err.Error()})
-	return C.CString(string(b))
-}
-
-func resultf(res interface{}) *C.char {
-	b, _ := json.Marshal(&struct{ Result interface{} }{res})
-	return C.CString(string(b))
+func errorf(err error) (*C.char, *C.char, *C.char) {
+	errt := reflect.TypeOf(err)
+	for errt.Kind() == reflect.Ptr {
+		errt = errt.Elem()
+	}
+	return nil, C.CString("runtime." + errt.Name()), C.CString(err.Error())
 }
 
 //export handle
-func handle(cevt, cctx, cenv *C.char) *C.char {
+func handle(cevt, cctx, cenv *C.char) (*C.char, *C.char, *C.char) {
 	var err error
 	err = populate([]byte(C.GoString(cenv)))
 	if err != nil {
@@ -143,7 +141,12 @@ func handle(cevt, cctx, cenv *C.char) *C.char {
 	if !res[1].IsNil() {
 		return errorf(res[1].Interface().(error))
 	}
-	return resultf(res[0].Interface())
+
+	cres, err := json.Marshal(res[0].Interface())
+	if err != nil {
+		return errorf(err)
+	}
+	return C.CString(string(cres)), nil, nil
 }
 
 func init() {

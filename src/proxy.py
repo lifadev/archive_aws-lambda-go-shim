@@ -32,7 +32,7 @@ class Proxy(object):
         return self._handle
 
     def _handle(self, evt, ctx):
-        res = runtime.handle(
+        return json.loads(runtime.handle(
             json.dumps(evt),
             json.dumps(ctx, default=dump),
             json.dumps({k: v for k, v in {k: os.getenv(k) for k in (
@@ -41,9 +41,4 @@ class Proxy(object):
                 "AWS_SESSION_TOKEN",
                 "AWS_SECURITY_TOKEN"
             )}.items() if v}),
-            ctx.log, ctx.get_remaining_time_in_millis)
-        if res is not None:
-            res = json.loads(res)
-            if "Error" in res:
-                raise Exception(res["Error"])
-            return res["Result"]
+            ctx.log, ctx.get_remaining_time_in_millis))

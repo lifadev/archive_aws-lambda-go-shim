@@ -20,9 +20,11 @@
 extern "C" {
 #endif
 
+struct handle_return { char* r0; char* r1; char* r2; };
+
 extern char * open(const char *, const char *);
 extern char * lookup(const char *);
-extern char * handle(const char *, const char *, const char *);
+extern struct handle_return handle(const char *, const char *, const char *);
 
 static PyObject *runtime_log_fn,
                 *runtime_rtm_fn;
@@ -92,8 +94,6 @@ static PyObject *
 runtime_handle(PyObject *self, PyObject *args)
 {
     const char *cevt, *cctx, *cenv;
-    char *ret;
-    PyObject *res;
 
     if (!PyArg_ParseTuple(args, "sssOO",
                           &cevt, &cctx, &cenv,
@@ -101,13 +101,22 @@ runtime_handle(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    if (!(ret = handle(cevt, cctx, cenv))) {
-        Py_RETURN_NONE;
+    struct handle_return gres = handle(cevt, cctx, cenv);
+
+    if (gres.r2 != NULL) {
+        PyObject* err = PyErr_NewException(gres.r1, NULL, NULL);
+        PyErr_SetString(err, gres.r2);
+        free(gres.r2);
+        return NULL;
     }
 
-    res = PyString_FromString(ret);
-    free(ret);
-    return res;
+    if (gres.r0 != NULL) {
+        PyObject* res = PyString_FromString(gres.r0);
+        free(gres.r0);
+        return res;
+    }
+
+    Py_RETURN_NONE;
 }
 
 static PyMethodDef runtime_methods[] = {
