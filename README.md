@@ -190,8 +190,21 @@ For the rest, the handler follows the [AWS Lambda programming model][aws-lambda-
   - **Result** – The first return value is **automatically json marshalled** and forwarded back to the client.  
     You are free to use the well known `interface{}` type, any other valid Go type or even your own custom type to 
     leverage [fine grained json marshalling][golang-jsoncus].
-  - **Error** – The second return value notify AWS Lambda an error occurred during execution. As expected it prevails 
-    over the first return value.
+  - **Error** – The second return value notifies AWS Lambda an error occurred during execution. As expected it prevails 
+    over the first return value. You are free to return native Go errors or custom ones:
+    ```go
+    type CustomError struct {
+	    s string
+    }
+
+    func (e *CustomError) Error() string {
+	    return e.s
+    }
+
+    func Handle(evt interface{}, ctx *runtime.Context) (interface{}, error) {
+      return nil, &CustomError{"somthing bad happened"}
+    }
+    ```
 
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
 #### logging
