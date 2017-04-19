@@ -43,8 +43,8 @@ build:
 
 shim:
 	@go build -buildmode=c-shared -ldflags='-w -s' -o dist/runtime.so ./src
-	@python -m compileall -q -d runtime src; rm src/pack.pyc; mv src/*.pyc dist/.
-	@cp src/pack.py dist/pack
+	@python -m compileall -q -d runtime src; mv src/*.pyc dist/.
+	@cp src/pack.bash dist/pack
 	@cp src/version.bash dist/version
 	@sed -i "s/VERSION/$(shell date -u +%Y-%m-%d)/g" dist/version
 	@chown $(shell stat -c '%u:%g' .) dist/*

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env bash
 
 #
 # Copyright 2017 Alsanium, SAS. or its affiliates. All rights reserved.
@@ -16,17 +16,16 @@
 # limitations under the License.
 #
 
-import sys
-import zipfile
+base=$PWD
+handler=$1
+binary=$2
+package=$3
 
-if __name__ == "__main__":
+mkdir -p /package/$handler
+cp $binary /package/$handler.so
+cp /shim/__init__.pyc /package/$handler/__init__.pyc
+cp /shim/proxy.pyc /package/$handler/proxy.pyc
+cp /shim/runtime.so /package/$handler/runtime.so
 
-    handler = sys.argv[1]
-    binary  = sys.argv[2]
-    package = sys.argv[3]
-    z = zipfile.ZipFile('{}'.format(package), 'w')
-    z.write('{}'.format(binary), '{}.so'.format(handler))
-    z.write('/shim/__init__.pyc', '{}/__init__.pyc'.format(handler))
-    z.write('/shim/proxy.pyc', '{}/proxy.pyc'.format(handler))
-    z.write('/shim/runtime.so', '{}/runtime.so'.format(handler))
-    z.close()
+cd /package; zip -qr $package *; cd $base
+mv /package/$package .
