@@ -27,5 +27,5 @@ cp /shim/__init__.pyc /package/$handler/__init__.pyc
 cp /shim/proxy.pyc /package/$handler/proxy.pyc
 cp /shim/runtime.so /package/$handler/runtime.so
 
-cd /package; zip -qr $package *; cd $base
+cd /package; find . -exec touch -t 201302210800 {} +;  zip -qrX $package *; cd $base
 mv /package/$package .

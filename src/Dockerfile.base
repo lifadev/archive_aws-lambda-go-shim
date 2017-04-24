@@ -25,7 +25,7 @@ ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
 RUN true \
   && yum -q -e 0 -y update || true \
-  && yum -q -e 0 -y install gcc gcc-c++ python27-devel zip || true \
+  && yum -q -e 0 -y install findutils gcc gcc-c++ python27-devel zip || true \
   && yum -q -e 0 -y clean all \
   && curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
   && echo "$GOLANG_DOWNLOAD_SHA256 golang.tar.gz" | sha256sum -c - \
