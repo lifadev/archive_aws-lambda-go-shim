@@ -16,16 +16,23 @@
 # limitations under the License.
 #
 
-base=$PWD
-handler=$1
-binary=$2
-package=$3
+CUR=$PWD
+HLD=$1
+BIN=$2
+PKG=$3
+TMP=`mktemp -d`
 
-mkdir -p /package/$handler
-cp $binary /package/$handler.so
-cp /shim/__init__.pyc /package/$handler/__init__.pyc
-cp /shim/proxy.pyc /package/$handler/proxy.pyc
-cp /shim/runtime.so /package/$handler/runtime.so
+mkdir $TMP/$HLD
 
-cd /package; find . -exec touch -t 201302210800 {} +;  zip -qrX $package *; cd $base
-mv /package/$package .
+cp $BIN $TMP/$HLD.so
+cp /shim/__init__.pyc $TMP/$HLD/__init__.pyc
+cp /shim/proxy.pyc $TMP/$HLD/proxy.pyc
+cp /shim/runtime.so $TMP/$HLD/runtime.so
+
+cd $TMP
+find . -exec touch -t 201302210800 {} +
+zip -qrX $PKG *
+
+mv $PKG $CUR/.
+
+rm -rf $TMP
