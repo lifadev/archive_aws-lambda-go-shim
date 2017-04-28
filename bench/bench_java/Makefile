@@ -32,8 +32,8 @@ all: build pack
 
 build:
 	@docker run --rm                                                             \
-	  -v $(CURDIR):/tmp                                                          \
-	  -w /tmp                                                                    \
+	  -v $(CURDIR):/build                                                        \
+	  -w /build                                                                  \
 	  openjdk:8-jdk bash -c "                                                    \
 	    javac -d . Handler.java;                                                 \
 	    chown -R $(shell id -u):$(shell id -g) *                                 \

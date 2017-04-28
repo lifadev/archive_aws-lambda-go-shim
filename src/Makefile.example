@@ -31,7 +31,7 @@ GOPATH  ?= $(HOME)/go
 
 WORKDIR = $(CURDIR:$(GOPATH)%=/go%)
 ifeq ($(WORKDIR),$(CURDIR))
-	WORKDIR = /tmp
+	WORKDIR = /build
 endif
 
 docker:
@@ -39,22 +39,32 @@ docker:
 	  -e HANDLER=$(HANDLER)                                                      \
 	  -e PACKAGE=$(PACKAGE)                                                      \
 	  -v $(GOPATH):/go                                                           \
-	  -v $(CURDIR):/tmp                                                          \
+	  -v $(CURDIR):/build                                                        \
 	  -w $(WORKDIR)                                                              \
 	  eawsy/aws-lambda-go-shim:latest make all
 
+.PHONY: docker
+
 all: build pack perm
+
+.PHONY: all
 
 build:
 	@go build -buildmode=plugin -ldflags='-w -s' -o $(HANDLER).so
 
+.PHONY: build
+
 pack:
 	@pack $(HANDLER) $(HANDLER).so $(PACKAGE).zip
+
+.PHONY: pack
 
 perm:
 	@chown $(shell stat -c '%u:%g' .) $(HANDLER).so $(PACKAGE).zip
 
-clean:
-	@rm -rf $(HANDLER) $(HANDLER).so $(PACKAGE).zip
+.PHONY: perm
 
-.PHONY: docker all build pack perm clean
+clean:
+	@rm -rf $(HANDLER).so $(PACKAGE).zip
+
+.PHONY: clean

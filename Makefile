@@ -37,8 +37,8 @@ build:
 	@mkdir -p dist
 	@docker run --rm                                                             \
 	  -v $(GOPATH):/go                                                           \
-	  -v $(CURDIR):/tmp                                                          \
-	  -w /tmp                                                                    \
+	  -v $(CURDIR):/build                                                        \
+	  -w /build                                                                  \
 	  eawsy/aws-lambda-go-shim:base make shim
 
 shim:
@@ -55,8 +55,8 @@ test:
 	  $(MAKE) || exit 2;                                                         \
 	  unzip -qo *.zip;                                                           \
 	  docker run --rm                                                            \
-	    -v $(CURDIR)/$$test:/tmp                                                 \
-	    -w /tmp                                                                  \
+	    -v $(CURDIR)/$$test:/build                                               \
+	    -w /build                                                                \
 	    amazonlinux:latest python -B -m unittest discover -f || exit 2;          \
 	  cd $(CURDIR);                                                              \
 	done
@@ -92,6 +92,7 @@ clean:
 	@for dir in $(TESTS); do                                                     \
 	  cd $$dir;                                                                  \
 	  $(MAKE) clean;                                                             \
+	  rm -rf handler;                                                            \
 	  cd $(CURDIR);                                                              \
 	done
 	@for dir in $(shell ls -d bench/*/); do                                      \
