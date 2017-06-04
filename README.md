@@ -17,6 +17,32 @@ author your AWS Lambda functions, natively, in [C#][aws-lambda-csharp], [Java][a
 [Node.js][aws-lambda-nodejs] and [Python][aws-lambda-python]. This project provides a **native** and **full-featured** 
 shim for authoring your AWS Lambda functions in Go.
 
+**Table of Contents** generated with [DocToc](https://github.com/thlorenz/doctoc)
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Preview](#preview)
+- [Features](#features)
+- [Performance](#performance)
+- [How It Works](#how-it-works)
+  - [Quick Hands-On](#quick-hands-on)
+  - [Under the Hood](#under-the-hood)
+    - [Main Package](#main-package)
+    - [Runtime Context](#runtime-context)
+    - [Get Dependencies](#get-dependencies)
+    - [Handler Signature](#handler-signature)
+    - [Logging](#logging)
+    - [Exceptions](#exceptions)
+    - [Building](#building)
+    - [Deployment](#deployment)
+  - [Known Limitations](#known-limitations)
+  - [Edge Behaviors](#edge-behaviors)
+- [License](#license)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
 ## Preview
 
@@ -59,44 +85,53 @@ obsolete.
 ## How It Works
 
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
-### TL;DR
+### Quick Hands-On
 
-- 0 - Requirements
+  0. Requirements
 
-  ```sh
-  docker pull eawsy/aws-lambda-go-shim:latest
-  go get -u -d github.com/eawsy/aws-lambda-go-core/...
-  wget -O Makefile https://git.io/vytH8
-  ```
+      ```sh
+      docker pull eawsy/aws-lambda-go-shim:latest
+      go get -u -d github.com/eawsy/aws-lambda-go-core/...
+      wget -O Makefile https://git.io/vytH8
+      ```
 
-- 1 - Code
+1. Code
 
-  ```go
-  package main
+      ```go
+      package main
 
-  import (
-    "encoding/json"
+      import (
+        "encoding/json"
 
-    "github.com/eawsy/aws-lambda-go-core/service/lambda/runtime"
-  )
+        "github.com/eawsy/aws-lambda-go-core/service/lambda/runtime"
+      )
 
-  func Handle(evt json.RawMessage, ctx *runtime.Context) (interface{}, error) {
-    // ...
-  }
-  ```
+      func Handle(evt json.RawMessage, ctx *runtime.Context) (interface{}, error) {
+        // ...
+      }
+      ```
 
-- 2 - Build
+2. Build
 
-  ```sh
-  make
-  ```
+      ```sh
+      make
+      ```
 
-- 3 - Deploy
+3. Deploy
 
-  ```sh
-  Runtime: python2.7
-  Handler: handler.Handle
-  ```
+      You can use your preferred deployment method by providing it the following
+      configuration:
+
+      - Runtime: **python2.7**
+      - Handler: **handler.Handle**
+
+      For example, if you deploy your function through the 
+      [AWS Lambda Management Console](https://console.aws.amazon.com/lambda/home#/create/configure-function),
+      you will have to fill a bunch of parameters like:
+
+      <p align="center">
+        <img src="asset/aws_config-preview.png" align="center">
+      </p>
 
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
 ### Under the Hood
@@ -127,7 +162,7 @@ Let's review the content of `handler.go`:
 ```
 
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
-#### main package
+#### Main Package
 
 For a seamless experience we leverage [Go 1.8 plugins][golang-plug] to separate the shim from your code. At run time, 
 AWS Lambda loads our pre-compiled shim which in turn loads your code (your plugin). A plugin is a 
@@ -135,7 +170,7 @@ AWS Lambda loads our pre-compiled shim which in turn loads your code (your plugi
 restriction only applies to your entrypoint and you are free to organize the rest of your code in different packages.
 
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
-#### runtime context
+#### Runtime Context
 
 While your function is executing, it can interact with AWS Lambda to get useful runtime information such as, how much 
 time is remaining before AWS Lambda terminates your function, the AWS request id, etc. This information is passed as the 
@@ -145,7 +180,7 @@ available information** in the exact same way that official AWS Lambda runtimes 
 need, as seen in line 3. 
 
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
-#### get dependencies
+#### Get Dependencies
 
 `eawsy/aws-lambda-go-core` dependency can be retrieved using the well known `go get` command:
 
@@ -160,7 +195,7 @@ projects:
 - If the `preview` folder is outside `GOPATH`, then `vendor` folder is ignored in favor of `GOPATH` dependencies.
 
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
-#### handler signature
+#### Handler Signature
 
 ```go
 5 func Handle(evt interface{}, ctx *runtime.Context) (string, error) {
@@ -207,7 +242,7 @@ For the rest, the handler follows the [AWS Lambda programming model][aws-lambda-
     ```
 
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
-#### logging
+#### Logging
 
 In line with the [AWS Lambda programming model][aws-lambda-model], one should be able to output logs using standard
 abilities of the language. Your function can contain logging statements using the official [Go log package][golang-log]
@@ -230,7 +265,7 @@ func Handle(evt interface{}, ctx *runtime.Context) (interface{}, error) {
 ```
 
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
-#### exceptions
+#### Exceptions
 
 In the course of a normal and controlled execution flow, you can notify AWS Lambda an error occurred by returning an 
 `error` as [explained above](#handler-signature).  
@@ -239,7 +274,7 @@ In case of unexpected situations when the ordinary flow of control stops and beg
 notified an error occurred.
 
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
-#### building
+#### Building
 
 We provide a [Docker image][eawsy-docker] based on [Amazon Linux container image][aws-docker-image] to build your binary
 in the exact same environment than AWS Lambda. This image embeds our pre-compiled shim along with helper scripts to
