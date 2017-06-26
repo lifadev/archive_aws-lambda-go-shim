@@ -29,18 +29,14 @@ HANDLER ?= handler
 PACKAGE ?= $(HANDLER)
 GOPATH  ?= $(HOME)/go
 
-WORKDIR = $(CURDIR:$(GOPATH)%=/go%)
-ifeq ($(WORKDIR),$(CURDIR))
-	WORKDIR = /build
-endif
-
 docker:
 	@docker run --rm                                                             \
 	  -e HANDLER=$(HANDLER)                                                      \
 	  -e PACKAGE=$(PACKAGE)                                                      \
-	  -v $(GOPATH):/go                                                           \
-	  -v $(CURDIR):/build                                                        \
-	  -w $(WORKDIR)                                                              \
+	  -e GOPATH=$(GOPATH)                                                        \
+	  -v $(CURDIR):$(CURDIR)                                                     \
+	  $(foreach GP,$(subst :, ,$(GOPATH)),-v $(GP):$(GP))                        \
+	  -w $(CURDIR)                                                               \
 	  eawsy/aws-lambda-go-shim:latest make all
 
 .PHONY: docker
