@@ -36,9 +36,10 @@ image-shim: build
 build:
 	@mkdir -p dist
 	@docker run --rm                                                             \
-	  -v $(GOPATH):/go                                                           \
-	  -v $(CURDIR):/build                                                        \
-	  -w /build                                                                  \
+	  -e GOPATH=$(GOPATH)                                                        \
+	  $(foreach GP,$(subst :, ,$(GOPATH)),-v $(GP):$(GP))                        \
+	  -v $(CURDIR):$(CURDIR)                                                     \
+	  -w $(CURDIR)                                                               \
 	  eawsy/aws-lambda-go-shim:base make shim
 
 shim:
@@ -55,8 +56,10 @@ test:
 	  $(MAKE) || exit 2;                                                         \
 	  unzip -qo *.zip;                                                           \
 	  docker run --rm                                                            \
-	    -v $(CURDIR)/$$test:/build                                               \
-	    -w /build                                                                \
+	    -e GOPATH=$(GOPATH)                                                      \
+	    $(foreach GP,$(subst :, ,$(GOPATH)),-v $(GP):$(GP))                      \
+	    -v $(CURDIR):$(CURDIR)                                                   \
+	    -w $(CURDIR)/$$test                                                      \
 	    amazonlinux:latest python -B -m unittest discover -f || exit 2;          \
 	  cd $(CURDIR);                                                              \
 	done
