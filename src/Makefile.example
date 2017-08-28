@@ -27,16 +27,23 @@
 
 HANDLER ?= handler
 PACKAGE ?= $(HANDLER)
-GOPATH  ?= $(HOME)/go
+
+ifeq ($(OS),Windows_NT)
+	GOPATH ?= $(USERPROFILE)/go
+	GOPATH := /$(subst ;,:/,$(subst \,/,$(subst :,,$(GOPATH))))
+	CURDIR := /$(subst :,,$(CURDIR))
+else
+	GOPATH ?= $(HOME)/go
+endif
 
 docker:
-	@docker run --rm                                                             \
-	  -e HANDLER=$(HANDLER)                                                      \
-	  -e PACKAGE=$(PACKAGE)                                                      \
-	  -e GOPATH=$(GOPATH)                                                        \
-	  -v $(CURDIR):$(CURDIR)                                                     \
-	  $(foreach GP,$(subst :, ,$(GOPATH)),-v $(GP):$(GP))                        \
-	  -w $(CURDIR)                                                               \
+	@docker run --rm\
+	  -e HANDLER=$(HANDLER)\
+	  -e PACKAGE=$(PACKAGE)\
+	  -e GOPATH=$(GOPATH)\
+	  -v $(CURDIR):$(CURDIR)\
+	  $(foreach GP,$(subst :, ,$(GOPATH)),-v $(GP):$(GP))\
+	  -w $(CURDIR)\
 	  eawsy/aws-lambda-go-shim:latest make all
 
 .PHONY: docker
