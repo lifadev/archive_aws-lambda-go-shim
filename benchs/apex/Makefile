@@ -30,11 +30,12 @@ RELEASE=$(shell curl -s https://api.github.com/repos/apex/apex/releases | grep b
 all: download build
 
 download:
-	@wget -q $(RELEASE); mv apex_linux_amd64 apex; chmod +x apex
+	@wget -q $(RELEASE); mv apex_linux_amd64 apex; chmod +x apex; \
+	go get -u -d github.com/apex/go-apex
 
 build:
 	@cd functions/handler; go build -o main
-	@./apex build handler > handler.zip
+	./apex build handler > handler.zip
 
 clean:
 	@rm -f apex handler.zip functions/handler/main

@@ -34,7 +34,7 @@ if __name__ == "__main__":
     for exp in ["python", "eawsy", "nodejs", "java", "dotnet"]:
 
         runs = np.array([float(line.rstrip("\n"))
-                         for line in open("bench_" + exp + "/runs.txt")])
+                         for line in open(exp + "/runs.txt")])
 
         print exp
         print "========"

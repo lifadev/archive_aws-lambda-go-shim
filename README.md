@@ -347,8 +347,6 @@ Lambda:
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
 ### Known Limitations
 
-- For now you cannot have more than 8 exported functions in your main package due to 
-  [golang/go#19269](https://github.com/golang/go/issues/19269).
 - The behavior of the Go fmt package is non-deterministic in AWS CloudWatch Logs. Please use Go log package instead.
 
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
