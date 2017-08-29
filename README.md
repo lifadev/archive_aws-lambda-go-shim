@@ -17,7 +17,10 @@ author your AWS Lambda functions, natively, in [C#][aws-lambda-csharp], [Java][a
 [Node.js][aws-lambda-nodejs] and [Python][aws-lambda-python]. This project provides a **native** and **full-featured** 
 shim for authoring your AWS Lambda functions in Go.
 
-**Table of Contents** generated with [DocToc](https://github.com/thlorenz/doctoc)
+<details>
+<summary><b>Table of Contents</b></summary>
+
+<sub>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;generated with [DocToc](https://github.com/thlorenz/doctoc)</sub>
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -42,6 +45,7 @@ shim for authoring your AWS Lambda functions in Go.
 - [License](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+</details>
 
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
 ## Preview
@@ -87,7 +91,7 @@ obsolete.
 [<img src="asset/misc_arrow-up.png" align="right">](#top)
 ### Quick Hands-On
 
-  0. Requirements
+0. Requirements
 
       ```sh
       docker pull eawsy/aws-lambda-go-shim:latest
