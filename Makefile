@@ -29,16 +29,16 @@ test: $(TESTS)
 .PHONY: test
 
 $(TESTS):
-	@cd tests/$@;\
+	cd tests/$@;\
 	$(MAKE) || exit 2;\
 	unzip -qo *.zip;\
 	for i in $(shell seq 1 $(shell cat tests/$@/.run 2>/dev/null || echo 1)); do\
-	  docker run --rm\
-	    -e GOPATH=$(GOPATH)\
-	    $(foreach GP,$(subst :, ,$(GOPATH)),-v $(GP):$(GP))\
-	    -v $(CURDIR):$(CURDIR)\
-	    -w $(CURDIR)/tests/$@\
-	    eawsy/aws-lambda-go-shim:latest python -B -m unittest discover -f || exit 2;\
+		docker run --rm\
+		-e GOPATH=$(GOPATH)\
+		$(foreach GP,$(subst :, ,$(GOPATH)),-v $(GP):$(GP))\
+		-v $(CURDIR):$(CURDIR)\
+		-w $(CURDIR)/tests/$@\
+		eawsy/aws-lambda-go-shim:latest python -B -m unittest discover -f || exit 2;\
 	done
 
 bench: $(BENCHS)
@@ -48,24 +48,24 @@ bench: $(BENCHS)
 
 $(BENCHS):
 	@FUNCTION_NAME=shim-bench-`date +%s`;\
-	cd benchs/$@; rm -f runs.txt; $(MAKE);\
+	cd benchs/$@; $(RM) -f runs.txt; $(MAKE);\
 	aws lambda create-function\
-	  --role arn:aws:iam::$(AWS_ACCOUNT_ID):role/lambda_basic_execution\
-	  --function-name $$FUNCTION_NAME\
-	  --zip-file fileb://handler.zip\
-	  --runtime `cat .runtime | head -1`\
-	  --memory-size 128\
-	  --handler `cat .runtime | tail -1` > /dev/null;\
+		--role arn:aws:iam::$(AWS_ACCOUNT_ID):role/lambda_basic_execution\
+		--function-name $$FUNCTION_NAME\
+		--zip-file fileb://handler.zip\
+		--runtime `cat .runtime | head -1`\
+		--memory-size 128\
+		--handler `cat .runtime | tail -1` > /dev/null;\
 	for run in `seq 1 100`; do\
-	  aws lambda update-function-configuration\
-	    --function-name $$FUNCTION_NAME\
-	    --environment Variables="{RUN='$$run'}" > /dev/null;\
-	  aws lambda invoke\
-	    --function-name $$FUNCTION_NAME\
-	    --invocation-type RequestResponse\
-	    --log-type Tail /dev/null |\
-	    jq -r '.LogResult' | base64 -d | grep -o "[0-9\.]\+ ms" |\
-	    head -1 | awk '{print $$1}' >> runs.txt;\
+		aws lambda update-function-configuration\
+			--function-name $$FUNCTION_NAME\
+			--environment Variables="{RUN='$$run'}" > /dev/null;\
+		aws lambda invoke\
+			--function-name $$FUNCTION_NAME\
+			--invocation-type RequestResponse\
+			--log-type Tail /dev/null |\
+			jq -r '.LogResult' | base64 -d | grep -o "[0-9\.]\+ ms" |\
+			head -1 | awk '{print $$1}' >> runs.txt;\
 	done
 
 clean: $(CLEAN_TESTS) $(CLEAN_BENCHS)
@@ -75,7 +75,7 @@ clean: $(CLEAN_TESTS) $(CLEAN_BENCHS)
 $(CLEAN_TESTS):
 	@cd tests/$(patsubst %.clean,%,$@);\
 	$(MAKE) clean;\
-	rm -rf handler
+	$(RM) -rf handler
 
 $(CLEAN_BENCHS):
 	@cd benchs/$(patsubst %.clean,%,$@);\
