@@ -46,12 +46,11 @@ RUN true\
 
 RUN sed -i "s/VERSION/$(date -u +%Y-%m-%d)/g" dist/version
 
-FROM amazonlinux:2017.03.0.20170401
+FROM amazonlinux:2017.09.0.20170930
 
 ENV PATH /usr/local/go/bin:/shim:$PATH
 
 RUN true\
-  && yum -q -e 0 -y update || true\
   && yum -q -e 0 -y install gcc zip findutils || true\
   && yum -q -e 0 -y clean all
 
