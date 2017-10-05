@@ -14,14 +14,13 @@
 # limitations under the License.
 #
 
-FROM amazonlinux:2017.03.0.20170401 as builder
+FROM amazonlinux:2017.09.0.20170930 as builder
 
-ENV GOLANG_VERSION 1.9
+ENV GOLANG_VERSION 1.9.1
 ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
-ENV GOLANG_DOWNLOAD_SHA256 d70eadefce8e160638a9a6db97f7192d8463069ab33138893ad3bf31b0650a79
+ENV GOLANG_DOWNLOAD_SHA256 07d81c6b6b4c2dcf1b5ef7c27aaebd3691cdb40548500941f92b221147c5d9c7
 
 RUN true\
-  && yum -q -e 0 -y update || true\
   && yum -q -e 0 -y install gcc python27-devel || true\
   && yum -q -e 0 -y clean all
 
