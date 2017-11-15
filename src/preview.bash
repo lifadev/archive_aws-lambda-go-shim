@@ -104,4 +104,4 @@ aws lambda invoke                                                              \
   --log-type Tail  /dev/stderr                                                 \
   --query 'LogResult'                                                          \
   --output text |                                                              \
-  base64 -d | grep -o "[0-9\.]\+ ms" | head -1 | xargs -0 echo -n " executed in"
+  base64 --decode | grep -o "[0-9\.]\+ ms" | head -1 | xargs -0 echo -n " executed in"
