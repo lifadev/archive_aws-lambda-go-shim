@@ -35,10 +35,10 @@ class Proxy(object):
         return json.loads(runtime.handle(
             json.dumps(evt),
             json.dumps(ctx, default=dump),
-            json.dumps({k: v for k, v in {k: os.getenv(k) for k in (
+            json.dumps({k: v for k, v in ((k, os.getenv(k)) for k in (
                 "AWS_ACCESS_KEY_ID",
                 "AWS_SECRET_ACCESS_KEY",
                 "AWS_SESSION_TOKEN",
-                "AWS_SECURITY_TOKEN"
-            )}.items() if v}),
+                "AWS_SECURITY_TOKEN",
+            )) if v}),
             ctx.log, ctx.get_remaining_time_in_millis))
