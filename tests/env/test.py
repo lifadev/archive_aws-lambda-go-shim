@@ -21,6 +21,7 @@ os.environ["AWS_ACCESS_KEY_ID"] = "i1"
 os.environ["AWS_SECRET_ACCESS_KEY"] = "i2"
 os.environ["AWS_SESSION_TOKEN"] = "i3"
 os.environ["AWS_SECURITY_TOKEN"] = "i4"
+os.environ["_X_AMZN_TRACE_ID"] = "i5"
 
 import handler
 
@@ -36,12 +37,13 @@ class TestCase(unittest.TestCase):
 
     def test_case(self):
         try:
-            self.assertEqual(["i1", "i2", "i3", "i4"], handler.Handle({}, Context()))
+            self.assertEqual(["i1", "i2", "i3", "i4", "i5"], handler.Handle({}, Context()))
             os.environ["AWS_ACCESS_KEY_ID"] = "h1"
             os.environ["AWS_SECRET_ACCESS_KEY"] = "h2"
             os.environ["AWS_SESSION_TOKEN"] = "h3"
             os.environ["AWS_SECURITY_TOKEN"] = "h4"
-            self.assertEqual(["h1", "h2", "h3", "h4"], handler.Handle({}, Context()))
+            os.environ["_X_AMZN_TRACE_ID"] = "h5"
+            self.assertEqual(["h1", "h2", "h3", "h4", "h5"], handler.Handle({}, Context()))
         except Exception:
             self.fail("should not raise")
 

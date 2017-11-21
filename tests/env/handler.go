@@ -30,6 +30,7 @@ func init() {
 	ok = ok && os.Getenv("AWS_SECRET_ACCESS_KEY") == "i2"
 	ok = ok && os.Getenv("AWS_SESSION_TOKEN") == "i3"
 	ok = ok && os.Getenv("AWS_SECURITY_TOKEN") == "i4"
+	ok = ok && os.Getenv("_X_AMZN_TRACE_ID") == "i5"
 }
 
 func Handle(interface{}, *runtime.Context) (interface{}, error) {
@@ -42,5 +43,6 @@ func Handle(interface{}, *runtime.Context) (interface{}, error) {
 		os.Getenv("AWS_SECRET_ACCESS_KEY"),
 		os.Getenv("AWS_SESSION_TOKEN"),
 		os.Getenv("AWS_SECURITY_TOKEN"),
+		os.Getenv("_X_AMZN_TRACE_ID"),
 	}, nil
 }

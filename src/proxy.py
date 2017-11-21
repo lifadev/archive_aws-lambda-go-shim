@@ -40,5 +40,6 @@ class Proxy(object):
                 "AWS_SECRET_ACCESS_KEY",
                 "AWS_SESSION_TOKEN",
                 "AWS_SECURITY_TOKEN",
+                "_X_AMZN_TRACE_ID",
             )) if v}),
             ctx.log, ctx.get_remaining_time_in_millis))
