@@ -46,8 +46,8 @@ docker:
 		-e PACKAGE=$(PACKAGE)\
 		-e GOPATH=$(GOPATH)\
 		-e LDFLAGS='$(LDFLAGS)'\
-		-v $(CURDIR):$(CURDIR)\
-		$(foreach GP,$(subst :, ,$(GOPATH)),-v $(GP):$(GP))\
+		-v $(CURDIR):$(CURDIR):Z\
+		$(foreach GP,$(subst :, ,$(GOPATH)),-v $(GP):$(GP)):Z\
 		-w $(CURDIR)\
 		eawsy/aws-lambda-go-shim:latest make -f $(MAKEFILE) all
 
