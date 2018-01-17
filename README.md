@@ -1,5 +1,7 @@
 <a id="top" name="top"></a>
 
+<p align="center"><b>THIS PROJECT IS DEPRECATED IN FAVOR OF ITS SUCCESSOR<br><a href="https://github.com/aws/aws-lambda-go">aws/aws-lambda-go</a></b></p><br><br>
+
 [<img src="asset/logo_powered-by-aws.png" alt="Powered by Amazon Web Services" align="right">][aws-home]
 [<img src="asset/logo_created-by-eawsy.png" alt="Created by eawsy" align="right">][eawsy-home]
 
