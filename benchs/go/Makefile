@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 #
 # This is free and unencumbered software released into the public domain.
 #
@@ -27,24 +25,18 @@
 # For more information, please refer to <http://unlicense.org/>
 #
 
-import numpy as np
+HANDLER ?= handler
+PACKAGE ?= $(HANDLER)
 
-if __name__ == "__main__":
+all: build pack
 
-    for exp in ["python", "eawsy", "nodejs", "java", "dotnet", "go"]:
+build:
+	@GOOS=linux go build -ldflags='-w -s $(LDFLAGS)' -o $(HANDLER)
 
-        runs = np.array([float(line.rstrip("\n"))
-                         for line in open(exp + "/runs.txt")])
+pack:
+	@zip -rq $(PACKAGE).zip $(HANDLER)
 
-        print exp
-        print "========"
-        print "Min     \t", np.min(runs)
-        print "10th pct\t", np.percentile(runs, 10)
-        print "50th pct\t", np.percentile(runs, 50)
-        print "90th pct\t", np.percentile(runs, 90)
-        print "95th pct\t", np.percentile(runs, 95)
-        print "99th pct\t", np.percentile(runs, 99)
-        print "Max     \t", np.max(runs)
-        print "Mean    \t", np.mean(runs)
-        print "Std Dev \t", np.std(runs)
-        print
+clean:
+	@rm -rf $(HANDLER) $(PACKAGE).zip
+
+.PHONY: all build pack clean
